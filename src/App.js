@@ -13,12 +13,13 @@ function App() {
   const [ResponseState, setResponseState] = useState();
   const [userInputState, setUserInputState] = useState();
 
+
   function handleSubmit(e){
     e.preventDefault();
 
     const form = e.target;
     setUserInputState(form.userInputCity.value);
-    //console.log(form.userInputCity.value);
+    console.log(form.userInputCity.value);
 
     const getResponse = async() => {
       const response = await openai.chat.completions.create({
@@ -26,11 +27,15 @@ function App() {
         messages:[
           {
             "role": "user",
-            "content": `Please give me the top 10 restaurant options in ${userInputState}`,
+            "content": `Please give me the top 10 restaurant options in ${ form.userInputCity.value }`,
           }
         ]
       });
-      console.log("response: " + response.choices[0].message.content);
+      var res = response.choices[0].message.content;
+      for(let i = 2; i < 11; i++){
+        res = res.replace((String(i) + "."), "\n\n" + String(i) + ".");
+      }
+      console.log("response: " + res);
       setResponseState(response.choices[0].message.content);
     };
     getResponse();
@@ -46,7 +51,7 @@ function App() {
           <input name="userInputCity" />
           <button type="submit">Search</button>
         </form>
-        <div>
+        <div className='display-linebreak'>
           { ResponseState }
         </div>
       </header>
